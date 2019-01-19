@@ -18,17 +18,17 @@ XTENSA_TOOLS_ROOT ?= ~/Projekte/libs/esp-open-sdk/xtensa-lx106-elf/bin
  SDK_BASE	?= /home/enradion/Projekte/libs/esp-open-sdk/ESP8266_NONOS_SDK-2.1.0-18-g61248df
 #SDK_BASE	?= C:\Espressif\ESP8266_SDK_150
 SDK_TOOLS	?= /home/enradion/Projekte/libs/esp-open-sdk/esptool
-SNDCHIP_BASE 	?= /home/enradion/Projekte/sndchips
+# SNDCHIP_BASE 	?= sndchips
 
 # esptool path and port
-ESPTOOL ?= $(SDK_TOOLS)/esptool.py
-ESPPORT ?= COM14
+ESPTOOL ?= esptool.py
+ESPPORT ?= ttyUSB0
 # Baud rate for programmer
 BAUD ?= 921600
 #BAUD ?= 512000
 
 # SPI_SPEED = 40, 26, 20, 80
-SPI_SPEED ?= 40
+SPI_SPEED ?= 80
 # SPI_MODE: qio, qout, dio, dout
 SPI_MODE ?= qio
 # SPI_SIZE_MAP
@@ -39,7 +39,7 @@ SPI_MODE ?= qio
 # 4 : 4096 KB (512 KB + 512 KB)
 # 5 : 2048 KB (1024 KB + 1024 KB)
 # 6 : 4096 KB (1024 KB + 1024 KB)
-SPI_SIZE_MAP ?= 0
+SPI_SIZE_MAP ?= 2
 
 ifeq ($(SPI_SPEED), 26.7)
     freqdiv = 1
@@ -123,7 +123,7 @@ TARGET = app
 
 
 # which modules (subdirectories) of the project to include in compiling
-MODULES	= driver user controller user/lobaro-coap user/lobaro-coap/option-types user/lobaro-coap/interface/_common user/lobaro-coap/interface/esp8266 user/resources
+MODULES	= driver user controller user/lobaro-coap user/lobaro-coap/option-types user/lobaro-coap/interface/_common user/lobaro-coap/interface/esp8266 user/resources user/sndchips
 EXTRA_INCDIR = include $(SDK_BASE)/include
 
 
@@ -184,7 +184,7 @@ vpath %.c $(SRC_DIR)
 define compile-objects
 $1/%.o: %.c
 	$(vecho) "CC $$<"
-	$(Q) $(CC) $(INCDIR) $(MODULE_INCDIR) $(SNDCHIP_BASE) $(EXTRA_INCDIR) $(SDK_INCDIR) $(CFLAGS)  -c $$< -o $$@
+	$(Q) $(CC) $(INCDIR) $(MODULE_INCDIR) $(EXTRA_INCDIR) $(SDK_INCDIR) $(CFLAGS)  -c $$< -o $$@
 endef
 
 .PHONY: all checkdirs clean flash flashinit flashonefile rebuild
@@ -193,16 +193,18 @@ all: checkdirs $(TARGET_OUT)
 
 $(TARGET_OUT): $(APP_AR)
 	$(vecho) "LD $@"
+	$(vecho) "\e[1m$(LD) -L$(SDK_LIBDIR) $(LD_SCRIPT) $(LDFLAGS) -Wl,--start-group $(LIBS) $(APP_AR) -Wl,--end-group -o $@\e[0m"
 	$(Q) $(LD) -L$(SDK_LIBDIR) $(LD_SCRIPT) $(LDFLAGS) -Wl,--start-group $(LIBS) $(APP_AR) -Wl,--end-group -o $@
 	$(vecho) "------------------------------------------------------------------------------"
 	$(vecho) "Section info:"
 	$(Q) $(OBJDUMP) -h -j .data -j .rodata -j .bss -j .text -j .irom0.text $@
 	$(vecho) "------------------------------------------------------------------------------"
+	$(vecho) "\e[1m$(ESPTOOL) elf2image $(TARGET_OUT) -o$(FW_BASE)/ $(flashimageoptions)\e[0m"
 	$(Q) $(ESPTOOL) elf2image $(TARGET_OUT) -o$(FW_BASE)/ $(flashimageoptions)
 	$(vecho) "------------------------------------------------------------------------------"
-	$(vecho) "Generate 0x00000.bin and 0x40000.bin successully in folder $(FW_BASE)."
+	$(vecho) "Generate 0x00000.bin and 0x10000.bin successully in folder $(FW_BASE)."
 	$(vecho) "0x00000.bin-------->0x00000"
-	$(vecho) "0x40000.bin-------->0x40000"
+	$(vecho) "0x10000.bin-------->0x10000"
 	$(vecho) "Done"
 
 $(APP_AR): $(OBJ)

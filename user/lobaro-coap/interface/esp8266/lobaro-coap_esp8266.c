@@ -274,10 +274,10 @@ static bool ICACHE_FLASH_ATTR ESP8266_Config_SoftAP(){
 
 	wifi_get_macaddr(SOFTAP_IF, macaddr);
 	os_memset((void*)config.ssid, 0, sizeof(config.ssid));
-	os_sprintf(config.ssid, "Lobaro-CoAP(%02x%02x%02x%02x%02x%02x)", MAC2STR(macaddr));
+	os_sprintf(config.ssid, "DL1XY--CoAP(%02x%02x%02x%02x%02x%02x)", MAC2STR(macaddr));
 	config.ssid_len = 0;
 	os_memset((void*)config.password, 0, sizeof(config.password));
-	os_memcpy(config.password,"lobaro!!",8);
+	os_memcpy(config.password,"arnewo06",8);
 
 	config.ssid_hidden = 0;
 	config.authmode = AUTH_WPA2_PSK;//AUTH_WPA_WPA2_PSK; //AUTH_WPA_WPA2_PSK;
