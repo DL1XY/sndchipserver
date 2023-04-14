@@ -3,7 +3,6 @@
 Example of lib "lobaro-coap" runing natively on ESP8266 using ESP_IOT_SDK V1.5.
 
 ## Clone
-Please use the following git command to clone this repository (because of submodule):
 git clone --recursive 
 
 ## Dependencies
