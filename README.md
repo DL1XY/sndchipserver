@@ -1,6 +1,6 @@
 # lobaro-coap-on-esp8266
 
-Example of lib "lobaro-coap" runing natively on ESP8266 using ESP_IOT_SDK V1.5.
+Example of lib "lobaro-coap" running natively on ESP8266 using ESP_IOT_SDK V1.5.
 
 ## Clone
 git clone --recursive 
